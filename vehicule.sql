@@ -1,22 +1,3 @@
--- --------------------------------------------------------
--- Hôte :                        127.0.0.1
--- Version du serveur:           10.3.1-MariaDB - mariadb.org binary distribution
--- SE du serveur:                Win64
--- HeidiSQL Version:             9.4.0.5125
--- --------------------------------------------------------
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-
-
--- Export de la structure de la base pour gta_serveur
-DROP DATABASE IF EXISTS `gta_serveur`;
-CREATE DATABASE IF NOT EXISTS `gta_serveur` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin */;
-USE `gta_serveur`;
-
 -- Export de la structure de la table gta_serveur. gta_joueurs_vehicle
 DROP TABLE IF EXISTS `gta_joueurs_vehicle`;
 CREATE TABLE IF NOT EXISTS `gta_joueurs_vehicle` (
@@ -71,11 +52,3 @@ CREATE TABLE IF NOT EXISTS `gta_joueurs_vehicle` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `vehicle_plate` (`vehicle_plate`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
-
--- Export de données de la table gta_serveur.gta_joueurs_vehicle : ~7 rows (environ)
-/*!40000 ALTER TABLE `gta_joueurs_vehicle` DISABLE KEYS */;
-/*!40000 ALTER TABLE `gta_joueurs_vehicle` ENABLE KEYS */;
-
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
