@@ -4,6 +4,8 @@ local vehicles_list = {}
 local vehicles_list_menu = {}
 local vehicle_plate_list = {}
 local concessionnaire = ""
+local scaleform = nil
+
 
 local Ninja_Core__DisplayHelpAlert = function(msg)
 	BeginTextCommandDisplayHelp("STRING");  
@@ -20,14 +22,14 @@ local garage = {
 	selectedbutton = 1,
 	marker = { r = 0, g = 155, b = 255, a = 200, type = 1 },
 	menu = {
-		x = 0.8 + 0.07,
-		y = 0.05,
-		width = 0.2 + 0.05,
+		x = 0.1 + 0.03,
+		y = 0.0 + 0.03,
+		width = 0.2 + 0.02 + 0.005,
 		height = 0.04,
 		buttons = 10,
 		from = 1,
 		to = 10,
-		scale = 0.4,
+		scale = 0.3 + 0.05, --> Taille.
 		font = 0,
 		["main"] = {
 			title = "GARAGE PERSONNEL",
@@ -130,6 +132,18 @@ function LocalPed()
 end
 
 function OpenCreator()
+	if not HasStreamedTextureDictLoaded("commonmenu") then
+        RequestStreamedTextureDict("commonmenu", true)
+	end
+	
+	scaleform = RequestScaleformMovie("mp_menu_glare")
+    while not HasScaleformMovieLoaded(scaleform) do
+        Citizen.Wait(0)
+	end
+	
+	PushScaleformMovieFunction(scaleform, "initScreenLayout")
+	PopScaleformMovieFunctionVoid()
+	
 	local ped = LocalPed()
 	local pos = currentlocation.outside
 	local g = Citizen.InvokeNative(0xC906A7DAB05C8D2B,pos[1],pos[2],pos[3],Citizen.PointerValueFloat(),0)
@@ -172,6 +186,18 @@ function drawMenuButton(button,x,y,selected)
 	DrawText(x - menu.width/2 + 0.005, y - menu.height/2 + 0.0028)
 end
 
+function DrawTextMenu(fonteP, stringT, scale, posX, posY)
+    SetTextFont(fonteP)
+    SetTextProportional(0)
+    SetTextScale(scale, scale)
+    SetTextColour(255, 255, 255, 255)
+    SetTextCentre(true)
+    SetTextEntry("STRING")
+    AddTextComponentString(stringT)
+    DrawText(posX, posY)
+end
+
+
 function drawMenuTitle(txt,x,y)
 	local menu = garage.menu
 	SetTextFont(0)
@@ -182,7 +208,9 @@ function drawMenuTitle(txt,x,y)
 	for i=1, #menuConfig do 
 		DrawRect(x,y,menu.width,menu.height, menuConfig[i].couleurTopMenu.r, menuConfig[i].couleurTopMenu.g, menuConfig[i].couleurTopMenu.b, menuConfig[i].couleurTopMenu.a)
 	end
-	DrawText(x - menu.width/2 + 0.005, y - menu.height/2 + 0.0028)
+	DrawTextMenu(1, txt, 0.8,menu.width - 0.4 / 2 + 0.1 + 0.005, y - menu.height/2 + 0.01, 255, 255, 255)
+    DrawSprite("commonmenu", "interaction_bgd", x,y, menu.width,menu.height + 0.04 + 0.007, .0, 255, 255, 255, 255)
+    DrawScaleformMovie(scaleform, 0.42 + 0.003,0.45, 0.9,0.9)
 end
 
 
@@ -208,7 +236,7 @@ local backlock = false
 				if not garage.opened then
 					OpenCreator()
 				end
-			end   
+			end
 		if garage.opened then
 			DisableControlAction(0, 140, true) --> DESACTIVER LA TOUCHE POUR PUNCH
 			DisableControlAction(0, 172,true) --DESACTIVE CONTROLL HAUT
@@ -225,7 +253,7 @@ local backlock = false
 					else
 						selected = false
 					end
-				drawMenuButton(button,garage.menu.x,y,selected)
+				drawMenuButton(button,garage.menu.x,y + 0.02 + 0.003,selected)
 				y = y + 0.04
 					if selected and IsControlJustPressed(1,201) then
 						PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
@@ -280,13 +308,11 @@ function ButtonSelected(button)
 	local btn = button.name
 	if this == "main" then
 		if btn == "Rentrer mon véhicule" then
-			TriggerServerEvent('garages:CheckForVeh',source)
+			TriggerServerEvent('garages:CheckForVeh')
 		elseif btn == "Sortir un véhicule" then
-			TriggerServerEvent('garages:GetVehiclesList',source)
-			OpenMenu("garagepersonnel")
+			TriggerServerEvent('garages:GetVehiclesList')
 		elseif btn == "Renommer un véhicule" then
-			TriggerServerEvent('garages:GetVehiclesList',source)
-			OpenMenu("garagepersonnelRenomer")
+			TriggerServerEvent('garages:GetVehiclesList2')
 		end
 	elseif this == "garagepersonnel" then
 		TriggerServerEvent('garages:CheckForSpawnVeh',btn)
@@ -296,7 +322,7 @@ function ButtonSelected(button)
 end
 
 AddEventHandler("playerSpawned", function(spawn)
-    TriggerServerEvent("garages:PutVehInGarages",source)
+    TriggerServerEvent("garages:PutVehInGarages")
 end)
 
 
@@ -306,23 +332,10 @@ AddEventHandler('FinishCheckForVeh', function(vehicle)
 end)
 
 function OpenMenu(menu)
-	fakecar = {model = '', car = nil}
-	garage.lastmenu = garage.currentmenu
-	if menu == "vehicles" then
-		garage.lastmenu = "main"
-	elseif menu == "bikes"  then
-		garage.lastmenu = "main"
-	elseif menu == 'race_create_objects' then
-		garage.lastmenu = "main"
-	elseif menu == "race_create_objects_spawn" then
-		garage.lastmenu = "race_create_objects"
-	end
 	garage.menu.from = 1
-	garage.menu.to = 10
-	garage.selectedbutton = 0
+	garage.selectedbutton = 1
 	garage.currentmenu = menu
 end
-
 
 function Back()
 	if backlock then
@@ -342,7 +355,6 @@ function stringstarts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end
 
-
 RegisterNetEvent('garages:GetVehiclesListClient')
 AddEventHandler('garages:GetVehiclesListClient', function(vehicles)
 	vehicles_list = {}
@@ -353,10 +365,24 @@ AddEventHandler('garages:GetVehiclesListClient', function(vehicles)
 	for k, v in pairs (vehicles_list) do
 		table.insert(vehicles_list_menu, {name = v})
 	end
+	OpenMenu("garagepersonnel")
+end)
+
+RegisterNetEvent('garages:GetVehiclesListClient2')
+AddEventHandler('garages:GetVehiclesListClient2', function(vehicles)
+	vehicles_list = {}
+	vehicles_list = vehicles
+	for k,v in pairs(vehicles_list_menu) do
+		vehicles_list_menu[k] = nil
+	end
+	for k, v in pairs (vehicles_list) do
+		table.insert(vehicles_list_menu, {name = v})
+	end
+	OpenMenu("garagepersonnelRenomer")
 end)
 
 RegisterNetEvent('garages:SpawnVehicle')
-AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex,colorprimary,colorsecondary,pearlescentcolor,wheelcolor,neoncolor1,neoncolor2,neoncolor3,windowtint,wheeltype,mods0,mods1,mods2,mods3,mods4,mods5,mods6,mods7,mods8,mods9,mods10,mods11,mods12,mods13,mods14,mods15,mods16,turbo,tiresmoke,xenon,mods23,mods24,neon0,neon1,neon2,neon3,bulletproof,smokecolor1,smokecolor2,smokecolor3,modvariation)
+AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex,colorprimary,colorsecondary,pearlescentcolor,wheelcolor)
 	local car = GetHashKey(model)
 	local pos = currentlocation.outside
 	Citizen.CreateThread(function()			
@@ -381,67 +407,8 @@ AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex
 				SetVehicleNeonLightsColour(veh,tonumber(neoncolor1),tonumber(neoncolor2),tonumber(neoncolor3))
 				SetVehicleTyreSmokeColor(veh,tonumber(smokecolor1),tonumber(smokecolor2),tonumber(smokecolor3))
 				SetVehicleModKit(veh,0)
-				SetVehicleMod(veh, 0, tonumber(mods0))
-				SetVehicleMod(veh, 1, tonumber(mods1))
-				SetVehicleMod(veh, 2, tonumber(mods2))
-				SetVehicleMod(veh, 3, tonumber(mods3))
-				SetVehicleMod(veh, 4, tonumber(mods4))
-				SetVehicleMod(veh, 5, tonumber(mods5))
-				SetVehicleMod(veh, 6, tonumber(mods6))
-				SetVehicleMod(veh, 7, tonumber(mods7))
-				SetVehicleMod(veh, 8, tonumber(mods8))
-				SetVehicleMod(veh, 9, tonumber(mods9))
-				SetVehicleMod(veh, 10, tonumber(mods10))
-				SetVehicleMod(veh, 11, tonumber(mods11))
-				SetVehicleMod(veh, 12, tonumber(mods12))
-				SetVehicleMod(veh, 13, tonumber(mods13))
-				SetVehicleMod(veh, 14, tonumber(mods14))
-				SetVehicleMod(veh, 15, tonumber(mods15))
-				SetVehicleMod(veh, 16, tonumber(mods16))
 				SetPedIntoVehicle(GetPlayerPed(-1), veh, -1)
-				if turbo == "on" then
-					ToggleVehicleMod(veh, 18, true)
-				else
-					ToggleVehicleMod(veh, 18, false)
-				end
-				if tiresmoke == "on" then
-					ToggleVehicleMod(veh, 20, true)
-				else
-					ToggleVehicleMod(veh, 20, false)
-				end
-				if xenon == "on" then
-					ToggleVehicleMod(veh, 22, true)
-				else
-					ToggleVehicleMod(veh, 22, false)
-				end
-					SetVehicleWheelType(veh, tonumber(wheeltype))
-					SetVehicleMod(veh, 23, tonumber(mods23))
-					SetVehicleMod(veh, 24, tonumber(mods24))
-				if neon0 == "on" then
-					SetVehicleNeonLightEnabled(veh,0, true)
-				else
-					SetVehicleNeonLightEnabled(veh,0, false)
-				end
-				if neon1 == "on" then
-					SetVehicleNeonLightEnabled(veh,1, true)
-				else
-					SetVehicleNeonLightEnabled(veh,1, false)
-				end
-				if neon2 == "on" then
-					SetVehicleNeonLightEnabled(veh,2, true)
-				else
-					SetVehicleNeonLightEnabled(veh,2, false)
-				end
-				if neon3 == "on" then
-					SetVehicleNeonLightEnabled(veh,3, true)
-				else
-					SetVehicleNeonLightEnabled(veh,3, false)
-				end
-				if bulletproof == "on" then
-					SetVehicleTyresCanBurst(veh, false)
-				else
-					SetVehicleTyresCanBurst(veh, true)
-				end
+				
 				SetVehicleWindowTint(veh,tonumber(windowtint))
 				SetEntityInvincible(veh, false) 
 				SetVehicleHasBeenOwnedByPlayer(veh, true)
@@ -492,7 +459,6 @@ function table.HasValue( t, val )
 	return false
 end
 
-
 RegisterNetEvent('garages:StoreVehicle')
 AddEventHandler('garages:StoreVehicle', function(plate_list)
 	vehicle_plate_list = {}
@@ -500,110 +466,22 @@ AddEventHandler('garages:StoreVehicle', function(plate_list)
 	Citizen.CreateThread(function()		
 		Citizen.Wait(0)
 		local pos = currentlocation.outside
-		local veh = GetClosestVehicle(pos[1], pos[2], pos[3], 3.000, 0, 70)
+		local veh = GetVehiclePedIsIn(GetPlayerPed(-1))
 		SetEntityAsMissionEntity(veh, true, true)		
 		local platecaissei = GetVehicleNumberPlateText(veh)
-		if DoesEntityExist(veh) then	
-			for k, v in pairs (vehicle_plate_list) do
-				if v == platecaissei then 
-					local plate = v
-				end
+		for k, v in pairs (vehicle_plate_list) do
+			if v == platecaissei then 
+				local plate = v
 			end
-			if not table.HasValue(vehicle_plate_list,platecaissei) then				
-				drawNotification("Ce n'est pas ton véhicule")
-			else
-				SetEntityAsMissionEntity( veh, true, true )
-				local colors = table.pack(GetVehicleColours(veh))
-				local extra_colors = table.pack(GetVehicleExtraColours(veh))
-				local neoncolor = table.pack(GetVehicleNeonLightsColour(veh))
-				local mods = table.pack(GetVehicleMod(veh))
-				local smokecolor = table.pack(GetVehicleTyreSmokeColor(veh))
-				local plate = GetVehicleNumberPlateText(veh)
-				local plateindex = GetVehicleNumberPlateTextIndex(veh)
-				local colorprimary = colors[1]
-				local colorsecondary = colors[2]
-				local pearlescentcolor = extra_colors[1]
-				local wheelcolor = extra_colors[2]
-				local neoncolor1 = neoncolor[1]
-				local neoncolor2 = neoncolor[2]
-				local neoncolor3 = neoncolor[3]
-				local windowtint = GetVehicleWindowTint(veh)
-				local wheeltype = GetVehicleWheelType(veh)
-				local smokecolor1 = smokecolor[1]
-				local smokecolor2 = smokecolor[2]
-				local smokecolor3 = smokecolor[3]
-				local mods0 = GetVehicleMod(veh, 0)
-				local mods1 = GetVehicleMod(veh, 1)
-				local mods2 = GetVehicleMod(veh, 2)
-				local mods3 = GetVehicleMod(veh, 3)
-				local mods4 = GetVehicleMod(veh, 4)
-				local mods5 = GetVehicleMod(veh, 5)
-				local mods6 = GetVehicleMod(veh, 6)
-				local mods7 = GetVehicleMod(veh, 7)
-				local mods8 = GetVehicleMod(veh, 8)
-				local mods9 = GetVehicleMod(veh, 9)
-				local mods10 = GetVehicleMod(veh, 10)
-				local mods11 = GetVehicleMod(veh, 11)
-				local mods12 = GetVehicleMod(veh, 12)
-				local mods13 = GetVehicleMod(veh, 13)
-				local mods14 = GetVehicleMod(veh, 14)
-				local mods15 = GetVehicleMod(veh, 15)
-				local mods16 = GetVehicleMod(veh, 16)
-				local mods23 = GetVehicleMod(veh, 23)
-				local mods24 = GetVehicleMod(veh, 24)
-				if IsToggleModOn(veh,18) then
-					turbo = "on"
-				else
-					turbo = "off"
-				end
-				if IsToggleModOn(veh,20) then
-					tiresmoke = "on"
-				else
-					tiresmoke = "off"
-				end
-				if IsToggleModOn(veh,22) then
-					xenon = "on"
-				else
-					xenon = "off"
-				end
-				if IsVehicleNeonLightEnabled(veh,0) then
-					neon0 = "on"
-				else
-					neon0 = "off"
-				end
-				if IsVehicleNeonLightEnabled(veh,1) then
-					neon1 = "on"
-				else
-					neon1 = "off"
-				end
-				if IsVehicleNeonLightEnabled(veh,2) then
-					neon2 = "on"
-				else
-					neon2 = "off"
-				end
-				if IsVehicleNeonLightEnabled(veh,3) then
-					neon3 = "on"
-				else
-					neon3 = "off"
-				end
-				if GetVehicleTyresCanBurst(veh) then
-					bulletproof = "off"
-				else
-					bulletproof = "on"
-				end
-				if GetVehicleModVariation(veh,23) then
-					modvariation = "on"
-				else
-					modvariation = "off"
-				end
-				TriggerServerEvent("ply_garages2:UpdateVeh", plate, plateindex,colorprimary,colorsecondary,pearlescentcolor,wheelcolor,neoncolor1,neoncolor2,neoncolor3,windowtint,wheeltype,mods0,mods1,mods2,mods3,mods4,mods5,mods6,mods7,mods8,mods9,mods10,mods11,mods12,mods13,mods14,mods15,mods16,turbo,tiresmoke,xenon,mods23,mods24,neon0,neon1,neon2,neon3,bulletproof,smokecolor1,smokecolor2,smokecolor3,modvariation)
-				Citizen.InvokeNative(0xEA386986E786A54F, Citizen.PointerValueIntInitialized(veh))
-				drawNotification("Véhicule rentré")
-				TriggerServerEvent('garages:SetVehIn', platecaissei)
-			end
+		end
+		if not table.HasValue(vehicle_plate_list,platecaissei) then				
+			drawNotification("Ce n'est pas ton véhicule")
 		else
-			drawNotification("Aucun véhicule n'est sur la zone.")
-		end   
+			SetEntityAsMissionEntity( veh, true, true )
+			Citizen.InvokeNative(0xEA386986E786A54F, Citizen.PointerValueIntInitialized(veh))
+			drawNotification("Véhicule rentré")
+			TriggerServerEvent('garages:SetVehIn', platecaissei)
+		end
 		CloseCreator()
 	end)
 end)
