@@ -247,10 +247,6 @@ function ButtonSelected(button)
 end
 
 function Back()
-	if backlock then
-		return
-	end
-	backlock = true
 	if garage.currentmenu == "main" then
 		CloseCreator()
 	elseif garage.currentmenu == "garagepersonnel" then
@@ -259,7 +255,6 @@ function Back()
 		OpenMenu("main")
 	end
 end
-
 
 RegisterNetEvent('garages:GetVehiclesListClient')
 AddEventHandler('garages:GetVehiclesListClient', function(vehicles)
@@ -343,13 +338,13 @@ AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex
 				})
 
 				TriggerServerEvent('garages:SetVehOut', model)
+				print(veh)
 				TriggerEvent('garages:SetVehiculePerso', veh)
 			end   
 			CloseCreator()
 		end
 	end)
 end)
-
 
 RegisterNetEvent('garages:SetVehiculePerso')
 AddEventHandler('garages:SetVehiculePerso', function(vehicle)
@@ -434,12 +429,6 @@ AddEventHandler('garages:togglePortes', function()
 				end
 			end
 		end
-	else
-		exports.nCoreGTA:nNotificationMain({
-			text = "Ce véhicule ne vous appartient pas.",
-			type = 'basGauche',
-			nTimeNotif = 1000,
-		})
 	end
 end)
 
@@ -543,7 +532,6 @@ AddEventHandler("playerSpawned", function(spawn)
 end)
 
 
-local backlock = false
 Citizen.CreateThread(function()
 	while true do
 		if (IsControlJustReleased(0, 54) or IsControlJustReleased(0, 175)) and IsPlayerInRangeOfGarage() then
@@ -579,12 +567,11 @@ Citizen.CreateThread(function()
 		end
 
 		if garage.opened then
+
 			if IsControlJustPressed(1,202) then
 				Back()
 			end
-			if IsControlJustReleased(1,202) then
-				backlock = false
-			end
+
 			if IsControlJustPressed(1,188) then
 				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
 				if garage.selectedbutton > 1 then
@@ -595,6 +582,7 @@ Citizen.CreateThread(function()
 					end
 				end
 			end
+
 			if IsControlJustPressed(1,187)then
 				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
 				if garage.selectedbutton < buttoncount then
