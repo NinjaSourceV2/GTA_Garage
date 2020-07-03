@@ -11,7 +11,7 @@ Un simple garage vous permettant de ranger votre véhicule ainsi que de le Renom
 ## Features
 - Renommer son véhicule.
 - Ranger/Sortir son véhicule logic.
-- -> [Soon / Vente de véhicule possible.]
+- Verrouiller/Déverrouiller vos portes.
 
 ## License :
 @SuperCoolNinja
