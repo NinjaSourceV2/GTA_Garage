@@ -645,18 +645,17 @@ Citizen.CreateThread(function()
 				DUREE = 8
 				currentlocation = v
 			end
-			if v.haveblip then
-				DUREE = 8
-				DrawMarker(25,v.outside[1],v.outside[2],v.outside[3] - 0.1,0,0,0,0,0,0,3.0,3.0,0.1,84, 84, 84,200,0,0,0,0)
-				if GetDistanceBetweenCoords(v.outside[1],v.outside[2],v.outside[3],GetEntityCoords(LocalPed())) < 4 then
-					if GetLastInputMethod(0) then
-						Ninja_Core__DisplayHelpAlert("~INPUT_TALK~ pour accedez a votre ~b~garage")
-					else
-						Ninja_Core__DisplayHelpAlert("~INPUT_CELLPHONE_RIGHT~ accedez a votre ~b~garage")
-					end
-					currentlocation = v
-					inrange = true
+
+			DrawMarker(25,v.outside[1],v.outside[2],v.outside[3] - 0.1,0,0,0,0,0,0,3.0,3.0,0.1,84, 84, 84,200,0,0,0,0)
+			
+			if GetDistanceBetweenCoords(v.outside[1],v.outside[2],v.outside[3],GetEntityCoords(LocalPed())) < 4 then
+				if GetLastInputMethod(0) then
+					Ninja_Core__DisplayHelpAlert("~INPUT_TALK~ pour accedez a votre ~b~garage")
+				else
+					Ninja_Core__DisplayHelpAlert("~INPUT_CELLPHONE_RIGHT~ accedez a votre ~b~garage")
 				end
+				currentlocation = v
+				inrange = true
 			end
 			inrangeofgarage = inrange
 		end
