@@ -1,15 +1,26 @@
-fx_version 'adamant'
+fx_version 'cerulean'
 game 'gta5'
 
+dependencies {'ghmattimysql'}
 
-files {
-    'json/**/*'
+server_scripts {
+    'config/config.lua',
+    'server/server.lua'
 }
 
-dependencies {'ghmattimysql'}
-server_script 'server/server.lua'
-
 client_scripts {
-	'blacklist/blacklist.lua',
-	'client/client.lua'
+    "src/RMenu.lua",
+    "src/menu/RageUI.lua",
+    "src/menu/Menu.lua",
+    "src/menu/MenuController.lua",
+    "src/components/*.lua",
+    "src/menu/elements/*.lua",
+    "src/menu/items/*.lua",
+    "src/menu/panels/*.lua",
+    "src/menu/windows/*.lua",
+
+    'config/config.lua',
+    'client/client_utils.lua',
+    'client/client_main.lua',
+    'client/client_menu.lua'
 }
