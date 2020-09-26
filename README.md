@@ -1,4 +1,7 @@
 # GTA_Garage
+
+Un Garage Standalone, vous pouvez l'utilisé a part comme avec la source.
+
 Avec GTA_Garage chaque garage contient vos propres véhicule rentré individuellement, ansi que leur emplacement définis.
 A savoir que je n'ai pas fait en sorte de sauvegarder les dégats de véhicule, mais vous pourrez le faire facilement avec un peu de logic.
 
