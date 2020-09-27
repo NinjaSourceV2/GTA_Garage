@@ -58,6 +58,7 @@ Citizen.CreateThread(function()
                 end
            
                 if (IsControlJustReleased(0, 38) or IsControlJustReleased(0, 179)) then 
+                    TriggerServerEvent("garages:CheckVehiculeAntiDupli", GetInfoGarage())
                     TriggerServerEvent("garages:GetEmplacement", zone)
                     TriggerServerEvent('garages:GetVehiclesList', GetInfoGarage())
                     

@@ -63,7 +63,11 @@ AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex
                 waiting = waiting + 100
                 Citizen.Wait(100)
                 if waiting > 3000 then
-                    ShowNotification("~r~Véhicule non trouver.")
+                    exports.nCoreGTA:nNotificationMain({
+                        text = "~r~Véhicule non trouver.",
+                        type = 'basGauche',
+                        nTimeNotif = 3500,
+                    })
                     break
                 end
             end
@@ -107,7 +111,6 @@ AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex
 	end)
 end)
 
-
 RegisterNetEvent('garages:StoreFirstVehicle')
 AddEventHandler('garages:StoreFirstVehicle', function(zoneGarage)
     Citizen.CreateThread(function()		
@@ -137,7 +140,7 @@ AddEventHandler('garages:StoreFirstVehicle', function(zoneGarage)
             local newVehicleNom = InputText()
             TriggerServerEvent('garages:SetVehicule', newVehicleNom, model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
             Wait(150)
-            TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage)
+            TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage, platecaissei)
         else
             exports.nCoreGTA:nNotificationMain({
                 text = "~r~ Veuillez entrer dans un véhicule !",
@@ -147,7 +150,6 @@ AddEventHandler('garages:StoreFirstVehicle', function(zoneGarage)
 		end
 	end)
 end)
-
 
 RegisterNetEvent('garages:StoreVehicle')
 AddEventHandler('garages:StoreVehicle', function(zoneGarage, plate_list, max)
@@ -197,7 +199,7 @@ AddEventHandler('garages:StoreVehicle', function(zoneGarage, plate_list, max)
                     local newVehicleNom = InputText()
                     TriggerServerEvent('garages:SetVehicule', newVehicleNom, model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
                     Wait(150)
-                    TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage)
+                    TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage, platecaissei)
                     
                     exports.nCoreGTA:nNotificationMain({
                         text = "~g~ Véhicule rentré !",

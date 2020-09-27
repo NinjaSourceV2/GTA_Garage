@@ -1,5 +1,5 @@
 --> Version de la Resource : 
-local LatestVersion = ''; CurrentVersion = '1.5'
+local LatestVersion = ''; CurrentVersion = '1.6'
 PerformHttpRequest('https://raw.githubusercontent.com/NinjaSourceV2/GTA_Garage/master/VERSION', function(Error, NewestVersion, Header)
     LatestVersion = NewestVersion
     if CurrentVersion ~= NewestVersion then
@@ -82,6 +82,7 @@ AddEventHandler('garages:CheckForVeh', function(garage)
 	local identifier = GetPlayerIdentifiers(source)[1]
 	local maxEmplacement = garage["MaxVeh"]
 	local zone = garage["NomZone"]
+	local plate = nil
 
 	--print("Max Emplacement : ", maxEmplacement)
 	--print("Zone : ", zone)
@@ -89,23 +90,59 @@ AddEventHandler('garages:CheckForVeh', function(garage)
 	exports.ghmattimysql:execute("SELECT * FROM gta_joueurs_vehicle WHERE zone_garage = @nom", {['@nom'] = tostring(zone)}, function(res)
 		for k, v in pairs(res) do
 			table.insert(vehicle_plate_list, v.vehicle_plate)
+			plate = v.vehicle_plate
 		end
 
 		if (#res ~= 0) then
 			TriggerClientEvent('garages:StoreVehicle', source, zone, vehicle_plate_list, maxEmplacement)
 		else
 			TriggerClientEvent('garages:StoreFirstVehicle', source, zone)
-		end		
+		end
+
+		Wait(2500)
+
+		exports.ghmattimysql:scalar("SELECT vehicle_plate FROM gta_joueurs_vehicle GROUP BY vehicle_plate HAVING COUNT(vehicle_plate) > 1", function(dupli)
+			if dupli then 
+				exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE proprietaire = @proprietaire AND zone_garage = @zone_garage", {['@proprietaire'] = tostring("Volé"), ['@zone_garage'] = tostring(zone)})
+			end
+		end)
+	end)
+end)
+
+RegisterServerEvent('garages:CheckVehiculeAntiDupli')
+AddEventHandler('garages:CheckVehiculeAntiDupli', function(garage)
+	local source = source
+	local zone = garage["NomZone"]
+
+	exports.ghmattimysql:execute("SELECT * FROM gta_joueurs_vehicle WHERE zone_garage = @nom", {['@nom'] = tostring(zone)}, function(res)
+		exports.ghmattimysql:scalar("SELECT vehicle_plate FROM gta_joueurs_vehicle GROUP BY vehicle_plate HAVING COUNT(vehicle_plate) > 1", function(dupli)
+			if dupli then 
+				exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE proprietaire = @proprietaire AND zone_garage = @zone_garage", {['@proprietaire'] = tostring("Volé"), ['@zone_garage'] = tostring(zone)})
+			end
+		end)
 	end)
 end)
 
 RegisterServerEvent('garages:CheckDuplicationVeh')
-AddEventHandler('garages:CheckDuplicationVeh', function(zone)
+AddEventHandler('garages:CheckDuplicationVeh', function(zone, plate)
 	local source = source
+	local identifier = GetPlayerIdentifiers(source)[1]
+
 	exports.ghmattimysql:scalar("SELECT vehicle_plate FROM gta_joueurs_vehicle GROUP BY vehicle_plate HAVING COUNT(vehicle_plate) > 1", function(dupli)
 		if dupli then 
-			TriggerClientEvent('nMenuNotif:showNotification', source, "~r~ Duplication de véhicule détecter, le véhicule à été automatiquement supprimer !")
-			exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE vehicle_plate = @vehicle_plate AND zone_garage = @zone_garage", {['@vehicle_plate'] = tostring(dupli), ['@zone_garage'] = tostring(zone)})
+			exports.ghmattimysql:scalar("SELECT zone_garage FROM gta_joueurs_vehicle WHERE ?", {{['vehicle_plate'] = plate}}, function(zoneDupli)
+					exports.ghmattimysql:scalar("SELECT vehicle_state FROM gta_joueurs_vehicle WHERE ?", {{['vehicle_plate'] = plate}}, function(vehicleState)
+
+					if zoneDupli == "Aucun" then
+						exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['zone_garage'] = tostring(zone)}, {['vehicle_plate'] = plate}})
+						exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_state'] = tostring("Rentré")}, {['vehicle_plate'] = plate}})
+					else
+						TriggerClientEvent('nMenuNotif:showNotification', source, "~r~ Duplication de véhicule détecter, le véhicule à été automatiquement supprimer !")
+						exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE vehicle_plate = @vehicle_plate AND zone_garage = @zone_garage", {['@vehicle_plate'] = tostring(dupli), ['@zone_garage'] = tostring(zone)})
+						exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_state'] = tostring("Rentré")}, {['vehicle_plate'] = plate}})
+					end
+				end)
+			end)
 		end
 	end)
 end)
