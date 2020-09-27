@@ -27,7 +27,7 @@ Citizen.CreateThread(function()
                             RageUI.CloseAll(true)
                         elseif Index == 3 then 
                             TriggerServerEvent('garages:CheckForSpawnVeh', v.name, GetInfoGarage(), v.plaque)
-                            TriggerServerEvent('garages:RemoveVehicule', v.name)
+                            TriggerServerEvent('garages:RemoveVehicule', v.plaque)
                             RageUI.CloseAll(true)
                         end
                     end,

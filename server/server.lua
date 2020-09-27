@@ -1,5 +1,5 @@
 --> Version de la Resource : 
-local LatestVersion = ''; CurrentVersion = '1.4'
+local LatestVersion = ''; CurrentVersion = '1.5'
 PerformHttpRequest('https://raw.githubusercontent.com/NinjaSourceV2/GTA_Garage/master/VERSION', function(Error, NewestVersion, Header)
     LatestVersion = NewestVersion
     if CurrentVersion ~= NewestVersion then
@@ -15,10 +15,10 @@ AddEventHandler('garages:PutVehInGarages', function()
 end)
 
 RegisterServerEvent('garages:RemoveVehicule')
-AddEventHandler('garages:RemoveVehicule', function(vehicle_name)
+AddEventHandler('garages:RemoveVehicule', function(plaque)
 	local source = source
 	local player = GetPlayerIdentifiers(source)[1]
-	exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE vehicle_name = @nom", {['@nom'] = tostring(vehicle_name)})
+	exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE vehicle_plate = @plate", {['@plate'] = tostring(plaque)})
 end)
 
 local vehicles = {}
