@@ -7,8 +7,8 @@ PerformHttpRequest('https://raw.githubusercontent.com/NinjaSourceV2/GTA_Garage/m
     end
 end)
 
-RegisterServerEvent('garages:PutVehInGarages')
-AddEventHandler('garages:PutVehInGarages', function()
+RegisterServerEvent('garages:PutAllVehInGarages')
+AddEventHandler('garages:PutAllVehInGarages', function()
 	local source = source
 	local player = GetPlayerIdentifiers(source)[1]
 	exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_state'] = "Rentré"}, {['identifier'] = player}})
@@ -16,8 +16,6 @@ end)
 
 RegisterServerEvent('garages:RemoveVehicule')
 AddEventHandler('garages:RemoveVehicule', function(plaque)
-	local source = source
-	local player = GetPlayerIdentifiers(source)[1]
 	exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE vehicle_plate = @plate", {['@plate'] = tostring(plaque)})
 end)
 
@@ -26,7 +24,6 @@ RegisterServerEvent('garages:GetVehiclesList')
 AddEventHandler('garages:GetVehiclesList', function(garage)
 	vehicles = {}
 	local source = source
-	local player = GetPlayerIdentifiers(source)[1]
 	local zone = garage["NomZone"]
 
     exports.ghmattimysql:execute("SELECT * FROM gta_joueurs_vehicle WHERE zone_garage = @username",{['@username'] = tostring(zone)}, function(result)
@@ -41,7 +38,6 @@ end)
 RegisterServerEvent('garages:CheckForSpawnVeh')
 AddEventHandler('garages:CheckForSpawnVeh', function(vehiclename, garage, immatricule)
 	local source = source
-	local identifier = GetPlayerIdentifiers(source)[1]
 	local zone = garage["NomZone"]
 
 	exports.ghmattimysql:execute("SELECT * FROM gta_joueurs_vehicle WHERE zone_garage = @zone AND vehicle_name = @vehicle_name",{['@zone'] = tostring(zone), ['@vehicle_name'] = vehiclename}, function(result)
@@ -73,20 +69,13 @@ local vehicle_plate_list = {}
 RegisterServerEvent('garages:CheckForVeh')
 AddEventHandler('garages:CheckForVeh', function(garage)
 	vehicle_plate_list = {}
-
 	local source = source
-	local identifier = GetPlayerIdentifiers(source)[1]
 	local maxEmplacement = garage["MaxVeh"]
 	local zone = garage["NomZone"]
-	local plate = nil
 
-	--print("Max Emplacement : ", maxEmplacement)
-	--print("Zone : ", zone)
-	
 	exports.ghmattimysql:execute("SELECT * FROM gta_joueurs_vehicle WHERE zone_garage = @nom", {['@nom'] = tostring(zone)}, function(res)
 		for k, v in pairs(res) do
 			table.insert(vehicle_plate_list, v.vehicle_plate)
-			plate = v.vehicle_plate
 		end
 
 		if (#res ~= 0) then
@@ -94,14 +83,6 @@ AddEventHandler('garages:CheckForVeh', function(garage)
 		else
 			TriggerClientEvent('garages:StoreFirstVehicle', source, zone)
 		end
-
-		Wait(1000)
-
-		exports.ghmattimysql:scalar("SELECT vehicle_plate FROM gta_joueurs_vehicle GROUP BY vehicle_plate HAVING COUNT(vehicle_plate) > 1", function(dupli)
-			if dupli then 
-				exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE proprietaire = @proprietaire AND zone_garage = @zone_garage", {['@proprietaire'] = tostring("Volé"), ['@zone_garage'] = tostring(zone)})
-			end
-		end)
 	end)
 end)
 
@@ -122,8 +103,6 @@ end)
 RegisterServerEvent('garages:CheckDuplicationVeh')
 AddEventHandler('garages:CheckDuplicationVeh', function(zone, plate)
 	local source = source
-	local identifier = GetPlayerIdentifiers(source)[1]
-
 	exports.ghmattimysql:scalar("SELECT vehicle_plate FROM gta_joueurs_vehicle GROUP BY vehicle_plate HAVING COUNT(vehicle_plate) > 1", function(dupli)
 		if dupli then 
 			exports.ghmattimysql:scalar("SELECT zone_garage FROM gta_joueurs_vehicle WHERE ?", {{['vehicle_plate'] = plate}}, function(zoneDupli)
@@ -133,9 +112,9 @@ AddEventHandler('garages:CheckDuplicationVeh', function(zone, plate)
 						exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['zone_garage'] = tostring(zone)}, {['vehicle_plate'] = plate}})
 						exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_state'] = tostring("Rentré")}, {['vehicle_plate'] = plate}})
 					else
-						TriggerClientEvent('nMenuNotif:showNotification', source, "~r~ Duplication de véhicule détecter, le véhicule à été automatiquement supprimer !")
 						exports.ghmattimysql:execute("DELETE FROM gta_joueurs_vehicle WHERE vehicle_plate = @vehicle_plate AND zone_garage = @zone_garage", {['@vehicle_plate'] = tostring(dupli), ['@zone_garage'] = tostring(zone)})
 						exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_state'] = tostring("Rentré")}, {['vehicle_plate'] = plate}})
+						TriggerClientEvent('nMenuNotif:showNotification', source, "~r~ Duplication de véhicule détecter, le véhicule à été automatiquement remis dans votre garage.")
 					end
 				end)
 			end)
@@ -171,6 +150,5 @@ end)
 
 AddEventHandler('playerDropped', function(reason)
 	local source = source
-	local player = GetPlayerIdentifiers(source)[1]
 	exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_state'] = "Rentré"}, {['vehicle_state'] = 'Sortit'}})
 end)

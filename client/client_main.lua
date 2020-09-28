@@ -136,8 +136,7 @@ AddEventHandler('garages:StoreFirstVehicle', function(zoneGarage)
                 nTimeNotif = 1000,
             })
 
-            local newVehicleNom = InputText()
-            TriggerServerEvent('garages:SetVehicule', newVehicleNom, model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
+            TriggerServerEvent('garages:SetVehicule', _, model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
             Wait(150)
             TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage, platecaissei)
         else
@@ -146,7 +145,9 @@ AddEventHandler('garages:StoreFirstVehicle', function(zoneGarage)
                 type = 'basGauche',
                 nTimeNotif = 1000,
             })
-		end
+        end
+        --> Anti Duplication :
+        TriggerServerEvent("garages:CheckVehiculeAntiDupli", GetInfoGarage())
 	end)
 end)
 
@@ -195,8 +196,7 @@ AddEventHandler('garages:StoreVehicle', function(zoneGarage, plate_list, max)
                     SetEntityAsMissionEntity(vehicle, true, true)
                     Citizen.InvokeNative(0xEA386986E786A54F, Citizen.PointerValueIntInitialized(vehicle))
 
-                    local newVehicleNom = InputText()
-                    TriggerServerEvent('garages:SetVehicule', newVehicleNom, model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
+                    TriggerServerEvent('garages:SetVehicule', _, model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
                     Wait(150)
                     TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage, platecaissei)
                     
@@ -219,7 +219,9 @@ AddEventHandler('garages:StoreVehicle', function(zoneGarage, plate_list, max)
                 type = 'basGauche',
                 nTimeNotif = 1000,
             })
-		end
+        end
+        --> Anti Duplication :
+        TriggerServerEvent("garages:CheckVehiculeAntiDupli", GetInfoGarage())
 	end)
 end)
 
@@ -261,5 +263,5 @@ end
 
 --> Si le joueur déco, on lui remet ses véhicule dans son garage a son spawn :
 AddEventHandler("playerSpawned", function(spawn)
-    TriggerServerEvent("garages:PutVehInGarages")
+    TriggerServerEvent("garages:PutAllVehInGarages")
 end)
