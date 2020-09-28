@@ -1,5 +1,4 @@
 --> Event : 
-proprietaire_list = {}
 vehicle_plate_list = {}
 getEmplacement = 0
 list_vehicule = {}
@@ -260,7 +259,7 @@ function refreshMenuRename()
     end
 end
 
-
+--> Si le joueur déco, on lui remet ses véhicule dans son garage a son spawn :
 AddEventHandler("playerSpawned", function(spawn)
     TriggerServerEvent("garages:PutVehInGarages")
 end)

@@ -1,5 +1,5 @@
 --> Version de la Resource : 
-local LatestVersion = ''; CurrentVersion = '1.6'
+local LatestVersion = ''; CurrentVersion = '1.7'
 PerformHttpRequest('https://raw.githubusercontent.com/NinjaSourceV2/GTA_Garage/master/VERSION', function(Error, NewestVersion, Header)
     LatestVersion = NewestVersion
     if CurrentVersion ~= NewestVersion then
@@ -56,20 +56,16 @@ AddEventHandler('garages:CheckForSpawnVeh', function(vehiclename, garage, immatr
 end)
 
 RegisterServerEvent('garages:RenameVeh')
-AddEventHandler('garages:RenameVeh', function(vehiclename)
+AddEventHandler('garages:RenameVeh', function(vehiclename, plaque)
 	local source = source
-	local identifier = GetPlayerIdentifiers(source)[1]
-	
-	exports.ghmattimysql:execute("SELECT * FROM gta_joueurs_vehicle WHERE identifier = @identifier AND vehicle_name = @vehicle_name",{['@identifier'] = identifier, ['@vehicle_name'] = vehiclename}, function(result)
+	exports.ghmattimysql:execute("SELECT * FROM gta_joueurs_vehicle WHERE vehicle_plate = @vehicle_plate AND vehicle_name = @vehicle_name",{['@vehicle_plate'] = plaque, ['@vehicle_name'] = vehiclename}, function(result)
 		TriggerClientEvent('garages:RenomerVeh', source, result[1].vehicle_name, result[1].vehicle_plate)
 	end)
 end)
 
 RegisterServerEvent('garages:NewVehiculeName')
 AddEventHandler('garages:NewVehiculeName', function(newVehicleName, plaque)
-	local source = source
-	local identifier = GetPlayerIdentifiers(source)[1]
-	exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ? AND ?", { {['vehicle_name'] = newVehicleName}, {['identifier'] = identifier}, {['vehicle_plate'] = plaque}})
+	exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_name'] = newVehicleName}, {['vehicle_plate'] = plaque}})
 end)
 
 
@@ -99,7 +95,7 @@ AddEventHandler('garages:CheckForVeh', function(garage)
 			TriggerClientEvent('garages:StoreFirstVehicle', source, zone)
 		end
 
-		Wait(2500)
+		Wait(1000)
 
 		exports.ghmattimysql:scalar("SELECT vehicle_plate FROM gta_joueurs_vehicle GROUP BY vehicle_plate HAVING COUNT(vehicle_plate) > 1", function(dupli)
 			if dupli then 
@@ -157,16 +153,12 @@ end)
 
 RegisterServerEvent('garages:SetVehOut')
 AddEventHandler('garages:SetVehOut', function(plate)
-	local source = source
-	local player = GetPlayerIdentifiers(source)[1]
-	exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ? AND ?", { {['vehicle_state'] = "Sortit"}, {['identifier'] = player}, {['vehicle_plate'] = plate}})
+	exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_state'] = "Sortit"}, {['vehicle_plate'] = plate}})
 end)
 
 RegisterServerEvent('garages:SetVehIn')
 AddEventHandler('garages:SetVehIn', function(plate)
-	local source = source
-	local player = GetPlayerIdentifiers(source)[1]
-	exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ? AND ?", { {['vehicle_state'] = "Rentré"}, {['identifier'] = player}, {['vehicle_plate'] = plate}})
+	exports.ghmattimysql:execute("UPDATE gta_joueurs_vehicle SET ? WHERE ?", { {['vehicle_state'] = "Rentré"}, {['vehicle_plate'] = plate}})
 end)
 
 RegisterServerEvent('garages:SetVehicule')
