@@ -136,7 +136,7 @@ AddEventHandler('garages:StoreFirstVehicle', function(zoneGarage)
                 nTimeNotif = 1000,
             })
 
-            TriggerServerEvent('garages:SetVehicule', _, model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
+            TriggerServerEvent('garages:SetVehicule', "Mon vehicule", model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
             Wait(150)
             TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage, platecaissei)
         else
@@ -196,7 +196,7 @@ AddEventHandler('garages:StoreVehicle', function(zoneGarage, plate_list, max)
                     SetEntityAsMissionEntity(vehicle, true, true)
                     Citizen.InvokeNative(0xEA386986E786A54F, Citizen.PointerValueIntInitialized(vehicle))
 
-                    TriggerServerEvent('garages:SetVehicule', _, model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
+                    TriggerServerEvent('garages:SetVehicule', "Mon vehicule", model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
                     Wait(150)
                     TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage, platecaissei)
                     
