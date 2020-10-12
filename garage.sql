@@ -15,4 +15,4 @@ CREATE TABLE IF NOT EXISTS `gta_joueurs_vehicle` (
   `proprietaire` varchar(155) COLLATE utf8mb4_bin DEFAULT 'Volé',
   `prix` int(255) DEFAULT 0,
   KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=415 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

@@ -48,7 +48,7 @@ Citizen.CreateThread(function()
            local plyCoords = GetEntityCoords(GetPlayerPed(-1), false)
            local dist = GetDistanceBetweenCoords(plyCoords, garagePos["x"], garagePos["y"], garagePos["z"], true)
 
-            if dist <= 3.0 then
+            if dist <= 5.0 then
                 Duree = 0
             
                 if GetLastInputMethod(0) then
@@ -57,7 +57,7 @@ Citizen.CreateThread(function()
                    Ninja_Core__DisplayHelpAlert("~INPUT_CELLPHONE_EXTRA_OPTION~ pour ~b~intéragir")
                 end
            
-                if (IsControlJustReleased(0, 38) or IsControlJustReleased(0, 179)) then 
+                if (IsControlJustReleased(0, 38) or IsControlJustReleased(0, 214)) then 
                     TriggerServerEvent("garages:CheckVehiculeAntiDupli", GetInfoGarage())
                     TriggerServerEvent("garages:GetEmplacement", zone)
                     TriggerServerEvent('garages:GetVehiclesList', GetInfoGarage())
