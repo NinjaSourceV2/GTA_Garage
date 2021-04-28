@@ -41,20 +41,12 @@ AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex
         local targetVehicle = getVehicleInDirection(playerPos, VehPos)
         
         if state == "Sortit" then
-            exports.nCoreGTA:nNotificationMain({
-				text = "Votre véhicule se trouve en dehors de votre garage.",
-				type = 'basGauche',
-				nTimeNotif = 3500,
-			})
+            TriggerEvent("NUI-Notification", {"Votre véhicule se trouve en dehors de votre garage. !", "warning"})
             return 
         end
 
 		if DoesEntityExist(targetVehicle) then
-			exports.nCoreGTA:nNotificationMain({
-				text = "La zone est encombrée",
-				type = 'basGauche',
-				nTimeNotif = 1000,
-			})
+            TriggerEvent("NUI-Notification", {"La zone est encombrée.", "warning"})
 		else
             RequestModel(model)
             local waiting = 0
@@ -62,11 +54,7 @@ AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex
                 waiting = waiting + 100
                 Citizen.Wait(100)
                 if waiting > 3000 then
-                    exports.nCoreGTA:nNotificationMain({
-                        text = "~r~Véhicule non trouver.",
-                        type = 'basGauche',
-                        nTimeNotif = 3500,
-                    })
+                    TriggerEvent("NUI-Notification", {"Véhicule non trouver.", "warning"})
                     break
                 end
             end
@@ -98,8 +86,7 @@ AddEventHandler('garages:SpawnVehicle', function(state, model, plate, plateindex
             local id = NetworkGetNetworkIdFromEntity(veh)
             SetNetworkIdCanMigrate(id, true)
             
-            exports.nCoreGTA:ShowNotification("Véhicule sorti, bonne route")
-
+            TriggerEvent("NUI-Notification", {"Véhicule sorti, bonne route"})
             TriggerServerEvent('garages:SetVehOut', plate)
             TriggerEvent('garages:SetVehiculePerso', veh)
 		end
@@ -126,14 +113,14 @@ AddEventHandler('garages:StoreFirstVehicle', function(zoneGarage)
             SetEntityAsMissionEntity(vehicle, true, true)
             Citizen.InvokeNative(0xEA386986E786A54F, Citizen.PointerValueIntInitialized(vehicle))
 
-            exports.nCoreGTA:ShowNotification("~g~ Véhicule rentré !")
+            TriggerEvent("NUI-Notification", {"Véhicule rentré !"})
 
 
             TriggerServerEvent('garages:SetVehicule', "Mon vehicule", model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
             Wait(150)
             TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage, platecaissei)
         else
-            exports.nCoreGTA:ShowNotification("~r~ Veuillez entrer dans un véhicule !")
+            TriggerEvent("NUI-Notification", {"Veuillez entrer dans un véhicule !", "warning"})
         end
         --> Anti Duplication :
         TriggerServerEvent("garages:CheckVehiculeAntiDupli", GetInfoGarage())
@@ -174,8 +161,7 @@ AddEventHandler('garages:StoreVehicle', function(zoneGarage, plate_list, max)
                 Citizen.InvokeNative(0xEA386986E786A54F, Citizen.PointerValueIntInitialized(vehicle))
                 
                 TriggerServerEvent('garages:SetVehIn', platecaissei)
-                
-                exports.nCoreGTA:ShowNotification("~g~ Véhicule rentré !")
+                TriggerEvent("NUI-Notification", {"Véhicule rentré !"})
             else
                 if getEmplacement <= max then
                     SetEntityAsMissionEntity(vehicle, true, true)
@@ -184,15 +170,13 @@ AddEventHandler('garages:StoreVehicle', function(zoneGarage, plate_list, max)
                     TriggerServerEvent('garages:SetVehicule', "Mon vehicule", model, platecaissei, primarycolor, secondarycolor, pearlescentcolor, wheelcolor, zoneGarage)
                     Wait(150)
                     TriggerServerEvent('garages:CheckDuplicationVeh', zoneGarage, platecaissei)
-                    
-                    exports.nCoreGTA:ShowNotification("~g~ Véhicule rentré !")
-
+                    TriggerEvent("NUI-Notification", {"Véhicule rentré !"})
                 else
-                    exports.nCoreGTA:ShowNotification("~y~Tout les emplacement disponible sont pris, veuillez revendre ou supprimer un véhicule.")
+                    TriggerEvent("NUI-Notification", {"Tout les emplacement disponible sont pris, veuillez revendre ou supprimer un véhicule.", "warning"})
                 end
 			end
         else
-            exports.nCoreGTA:ShowNotification("~r~ Veuillez entrer dans un véhicule !")
+            TriggerEvent("NUI-Notification", {"Veuillez entrer dans un véhicule !", "warning"})
         end
         --> Anti Duplication :
         TriggerServerEvent("garages:CheckVehiculeAntiDupli", GetInfoGarage())

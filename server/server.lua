@@ -1,5 +1,5 @@
 --> Version de la Resource : 
-local LatestVersion = ''; CurrentVersion = '1.9'
+local LatestVersion = ''; CurrentVersion = '2.0'
 PerformHttpRequest('https://raw.githubusercontent.com/NinjaSourceV2/GTA_Garage/master/VERSION', function(Error, NewestVersion, Header)
     LatestVersion = NewestVersion
     if CurrentVersion ~= NewestVersion then
@@ -31,7 +31,7 @@ AddEventHandler('garages:GetVehiclesList', function(garage)
 	local zone = garage["NomZone"]
 
     MySQL.Async.fetchAll("SELECT * FROM gta_joueurs_vehicle WHERE zone_garage = @username",{['@username'] = tostring(zone)}, function(result)
-		for k, v in pairs(result) do
+		for _, v in pairs(result) do
 			table.insert(vehicles, {name = v.vehicle_name, plaque = v.vehicle_plate, state = v.vehicle_state})
 		end
 
