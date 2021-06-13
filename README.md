@@ -13,6 +13,8 @@ A savoir que je n'ai pas fait en sorte de sauvegarder les dégats de véhicule, 
 - Ranger/Sortir son véhicule.
 - Supprimer son véhicule.
 - Utilise comme menu : RageUIV2
+- Peut vérrouiller/déverrouiller le véhicule avec U il vous faudra avec le clé du véhicule.
+- System de clés ajouté.
 
 ## License :
 @SuperCoolNinja
