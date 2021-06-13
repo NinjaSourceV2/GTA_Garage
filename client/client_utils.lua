@@ -67,4 +67,24 @@ Citizen.CreateThread(function()
             RemoveBlip(blip)
         end
     end
+
+    for i = 1, #Config.pos_receler do
+        local blip = Config.pos_receler[i]["Receler"]
+        local blip_config = Config.pos_receler[i]["Receler"]
+
+        blip = AddBlipForCoord(blip["x"], blip["y"], blip["z"])
+
+        if blip_config["AfficherBlip"] == true then
+            SetBlipSprite(blip, 365)
+            SetBlipDisplay(blip, 4)
+            SetBlipScale(blip, 0.9)
+            SetBlipColour(blip, 32)
+            SetBlipAsShortRange(blip, true)
+            BeginTextCommandSetBlipName("STRING")
+            AddTextComponentString(blip_config["NomZone"])
+            EndTextCommandSetBlipName(blip)
+        else
+            RemoveBlip(blip)
+        end
+    end
 end)
